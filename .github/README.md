@@ -6,6 +6,7 @@
 A powerful, Markdown (*.md) to HTML converter with dark theme support, Mermaid diagrams, syntax highlighting, and conversion history tracking. Perfect for creating beautiful documentation, technical guides, and knowledge bases.
 
 REALLY OUTPUTS ALL THE DIFFERENT TABLES, MERMAIDS, FLOWCHARTS, GRAPHS, CODE BLOCKS, ETC. EXACTLY AS THEY APPEAR IN VS CODE MARKDOWN PREVIEW AND ON GITHUB.
+![alt text](image.png)
 ## Features
 
 - 🎨 VS Code dark theme
