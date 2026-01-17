@@ -8,7 +8,7 @@ A powerful,  Markdown (*.md) to HTML converter with dark theme support, Mermaid 
 
 REALLY OUTPUTS ALL THE DIFFERENT TABLES, MERMAIDS, FLOWCHARTS, GRAPHS, CODE BLOCKS, ETC. 
 EXACTLY AS THEY APPEAR IN VS CODE MARKDOWN PREVIEW AND ON GITHUB.
-
+![alt text](image.png)
 ## ✨ Features
 
 - **🎨 VS Code Dark Theme**: Beautiful dark mode styling that mirrors VS Code's markdown preview
