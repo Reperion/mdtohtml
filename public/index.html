@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MDtoHTML - Markdown to HTML Converter with Mermaid & Dark Theme</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description"
+        content="Free online Markdown to HTML converter with VS Code dark theme, Mermaid diagram support, syntax highlighting, and batch conversion. Perfect for technical documentation and knowledge bases.">
+    <meta name="keywords"
+        content="markdown converter, markdown to html, mermaid diagrams, syntax highlighting, vscode theme, dark mode, documentation generator, technical writing, batch conversion, knowledge base">
+    <meta name="author" content="LuCIDDre@mS">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#1e1e1e">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="MDtoHTML - Markdown to HTML Converter">
+    <meta property="og:description"
+        content="Convert Markdown to beautifully styled HTML with VS Code dark theme, Mermaid diagrams, and syntax highlighting. Free and open-source.">
+    <meta property="og:site_name" content="MDtoHTML">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="MDtoHTML - Markdown to HTML Converter">
+    <meta name="twitter:description"
+        content="Convert Markdown to HTML with dark theme, Mermaid diagrams, and syntax highlighting. Perfect for documentation.">
+
+    <!-- Additional SEO -->
+    <link rel="canonical" href="http://localhost:3000">
+    <meta name="application-name" content="MDtoHTML Converter">
+    <meta name="generator" content="MDtoHTML v1.0.0">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #252526;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            width: 400px;
+        }
+
+        h1 {
+            color: #569cd6;
+            margin-bottom: 1.5rem;
+        }
+
+        input[type="file"] {
+            margin-bottom: 1.5rem;
+            color: #d4d4d4;
+        }
+
+        input[type="file"]::file-selector-button {
+            background-color: #0e639c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        input[type="file"]::file-selector-button:hover {
+            background-color: #1177bb;
+        }
+
+        button {
+            background-color: #0e639c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #1177bb;
+        }
+
+        #status {
+            margin-top: 1.5rem;
+            text-align: left;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .success {
+            color: #6a9955;
+        }
+
+        .error {
+            color: #f48771;
+        }
+
+        .history-section {
+            margin-top: 2rem;
+            text-align: left;
+            border-top: 1px solid #444;
+            padding-top: 1rem;
+        }
+
+        .history-item {
+            margin-bottom: 1rem;
+        }
+
+        .history-date {
+            font-weight: bold;
+            color: #569cd6;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+        }
+
+        .history-date:hover {
+            text-decoration: underline;
+        }
+
+        .file-list {
+            list-style: none;
+            padding-left: 1rem;
+            margin: 0;
+            display: none;
+            /* Hidden by default */
+        }
+
+        .file-list.visible {
+            display: block;
+        }
+
+        .file-list li {
+            margin-bottom: 0.25rem;
+        }
+
+        .file-list a {
+            color: #d4d4d4;
+            text-decoration: none;
+        }
+
+        .file-list a:hover {
+            color: #9cdcfe;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>MD to HTML Converter</h1>
+        <form id="uploadForm">
+            <input type="file" id="fileInput" name="files" multiple accept=".md" required>
+            <br>
+            <button type="submit">Convert Files</button>
+        </form>
+        <div id="status"></div>
+
+        <div id="historySection" class="history-section" style="display:none;">
+            <h2>Recent Conversions</h2>
+            <div id="historyList"></div>
+        </div>
+    </div>
+
+    <script>
+        // Fetch and display history on load
+        async function loadHistory() {
+            try {
+                const response = await fetch('/api/history');
+                const history = await response.json();
+
+                const historySection = document.getElementById('historySection');
+                const historyList = document.getElementById('historyList');
+
+                if (history.length > 0) {
+                    historySection.style.display = 'block';
+                    historyList.innerHTML = history.map((item, index) => `
+                        <div class="history-item">
+                            <div class="history-date" onclick="toggleFiles(${index})">
+                                📂 ${item.directory} <span style="font-size:0.8em; color:#888;">(${item.files.length} files)</span>
+                            </div>
+                            <ul id="files-${index}" class="file-list">
+                                ${item.files.map(f => `
+                                    <li>
+                                        <a href="/history/${item.directory}/${f}" target="_blank">📄 ${f}</a>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error('Failed to load history', err);
+            }
+        }
+
+        // Toggle file visibility
+        window.toggleFiles = function (index) {
+            const list = document.getElementById(`files-${index}`);
+            list.classList.toggle('visible');
+        }
+
+        loadHistory();
+
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = 'Converting...';
+            statusDiv.className = '';
+
+            const formData = new FormData();
+            const fileInput = document.getElementById('fileInput');
+
+            for (let i = 0; i < fileInput.files.length; i++) {
+                formData.append('files', fileInput.files[i]);
+            }
+
+            try {
+                const response = await fetch('/convert', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    statusDiv.innerHTML = `<p class="success"><strong>Success!</strong></p>
+                                           <p>Saved to: <code>${result.directory}</code></p>
+                                           <ul>${result.files.map(f => `<li>${f}</li>`).join('')}</ul>`;
+                    // Reload history to show new conversion
+                    loadHistory();
+                } else {
+                    const text = await response.text();
+                    statusDiv.innerHTML = `<p class="error">Error: ${text}</p>`;
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<p class="error">Network Error: ${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+
+</html>
